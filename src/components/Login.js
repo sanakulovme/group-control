@@ -25,8 +25,7 @@ const Login = () => {
       axios.post('http://52.53.242.81:7088/japan/edu/api/auth/login', inputs, config).then(response => {
         if(response.data.status){
           localStorage.setItem('token', response.data.token)
-          console.log(response.data)
-          // navigate('/');
+          navigate('/');
         }else{
           setError({status: true, message: response.data.message})
         }
