@@ -45,6 +45,7 @@ const Dashboard = () =>{
     try {
         const response = await axios.post('http://52.53.242.81:7088/japan/edu/api/group/create', groupData, config);
         fetchGroups();
+        $('#createModal').modal('hide');
         setGroupData(values => ({...values, name: ''}))
       } catch (error) {
         console.error('Error fetching groups:', error);
@@ -58,6 +59,7 @@ const Dashboard = () =>{
 
         if(response.data.success === true && response.status == 200){
           fetchGroups()
+          $('#editModal').modal('hide');
           setUpdateGroup({id: null, name: ''})
         }
       } catch (error) {
