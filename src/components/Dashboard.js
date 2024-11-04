@@ -6,19 +6,18 @@ import axios from 'axios'
 const Dashboard = () =>{
   const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [groupName, setgroupName] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-    }
-  }, [navigate]);
+  const [groupData, setGroupData] = useState({creatorId: 6, endDate: "2024-12-31", id: 0, name: '', startDate: "2024-11-04"});
+  const [updateGroup, setUpdateGroup] = useState({id: null, name: ''})
 
   const TOKEN = localStorage.getItem('token');
 
+  useEffect(() => {
+    if (!TOKEN) {
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const config = {
       headers: {
@@ -28,38 +27,57 @@ const Dashboard = () =>{
       }
   }
 
-  const data = {
-    "creatorId": 0,
-    "endDate": "2024-11-03",
-    "id": 0,
-    "name": "groupName",
-  }
-
-  useEffect(() => {
-    const fetchGroups = async () => {
+  const fetchGroups = async () => {
       try {
         const response = await axios.get(
-          'https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/get/all',
+          'https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/get/all/admin',
           config
         );
-        console.log('OKKKK')
+        setGroups(response.data.object)
       } catch (error) {
         console.error('Error fetching groups:', error);
       }
-    };
+  };
+  fetchGroups();
 
-    fetchGroups();
-  }, [navigate]);
 
-  // console.log(groups)
-  const GroupHandler = async () => {
+  const createGroupHandler = async () => {
     try {
-        const response = await axios.post('https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/create', data, config);
-        console.log('OK')
+        const response = await axios.post('https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/create', groupData, config);
+        fetchGroups();
       } catch (error) {
-        // console.error('Error fetching groups:', error);
+        console.error('Error fetching groups:', error);
       }
   }
+
+  const updateGroupHandler = async (event) => {
+    event.preventDefault();
+    try {
+        const response = await axios.put('https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/update', updateGroup, config);
+
+        if(response.data.success === true && response.status == 200){
+          fetchGroups()
+          setUpdateGroup({id: null, name: ''})
+        }
+      } catch (error) {
+        console.error('Error fetching groups:', error);
+      }
+  }
+
+  const deleteGroup = async (id) => {
+    if(confirm("O'chirilsinmi?")){
+      try {
+        const response = await axios.delete(`https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/delete?groupId=${id}`, config);
+
+        if(response.data.success === true && response.status == 200){
+          fetchGroups()
+        }
+      } catch (error) {
+        console.error('Error fetching groups:', error);
+      }
+    }
+  }
+
 
   return (
     <div className="d-flex flex-column p-4 gap-4 py-md-5 align-items-center justify-content-center">
@@ -69,67 +87,87 @@ const Dashboard = () =>{
           type="button"
           className="btn btn-primary"
           data-toggle="modal"
-          data-target="#exampleModal"
+          data-target="#createModal"
         >Create</button>
       </div>
       <div className="list-group">
-        <a href="#" className="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-          <div className="d-flex gap-2 w-100 justify-content-between">
-            <div>
-              <h6 className="mb-0">List group item heading</h6>
-              <p className="mb-0 opacity-75">Some placeholder content in a paragraph.</p>
+      {groups.map(group => (
+        <div key={group.id} className="list-group-item list-group-item-action py-3" aria-current="true">
+            <h6 className="mb-0">{group.name}</h6>
+
+            <div className='btn-group mt-3'>
+              <button
+                className='btn btn-primary'
+                data-toggle="modal"
+                data-target="#editModal"
+                onClick={() => setUpdateGroup(values => ({...values, id: group.id}))}>Edit</button>
+              <button
+                className='btn btn-danger'
+                onClick={() => deleteGroup(group.id)}
+                >Delete</button>
             </div>
-            <small className="opacity-50 text-nowrap">now</small>
-          </div>
-        </a>
-        <a href="#" className="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-          <div className="d-flex gap-2 w-100 justify-content-between">
-            <div>
-              <h6 className="mb-0">Another title here</h6>
-              <p className="mb-0 opacity-75">Some placeholder content in a paragraph that goes a little longer so it wraps to a new line.</p>
-            </div>
-            <small className="opacity-50 text-nowrap">3d</small>
-          </div>
-        </a>
-        <a href="#" className="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-          <div className="d-flex gap-2 w-100 justify-content-between">
-            <div>
-              <h6 className="mb-0">Third heading</h6>
-              <p className="mb-0 opacity-75">Some placeholder content in a paragraph.</p>
-            </div>
-            <small className="opacity-50 text-nowrap">1w</small>
-          </div>
-        </a>
+        </div>
+      ))}
+
       </div>
       <div className="container mt-5">
 
-      {/* Modal */}
+      {/* create Modal */}
       <div
         className="modal fade"
-        id="exampleModal"
+        id="createModal"
         tabIndex="-1"
         role="dialog"
-        aria-labelledby="exampleModalLabel"
+        aria-labelledby="createModalLabel"
         aria-hidden="true"
       >
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">Yangi guruh</h5>
+              <h5 className="modal-title" id="createModalLabel">Yangi guruh</h5>
               <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div className="modal-body">
-              <input onChange={(event) => setgroupName(event.target.value)} className='form-control' type="text" placeholder='Yangi guruh nomi...' />
+              <input onChange={(event) => setGroupData(values => ({ ...values, name: event.target.value}))} className='form-control' type="text" placeholder='Yangi guruh nomi...' />
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-dismiss="modal">Yopish</button>
-              <button type="button" className="btn btn-primary" onClick={GroupHandler}>Yaratish</button>
+              <button type="button" className="btn btn-primary" onClick={createGroupHandler}>Yaratish</button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      <div
+        className="modal fade show"
+        id="editModal"
+        tabIndex="-1"
+        role="dialog"
+        aria-labelledby="editModalLabel"
+      >
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="editModalLabel">Guruhni yangilash</h5>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <input value={updateGroup.name} onChange={(event) => setUpdateGroup(values => ({...values, name: event.target.value}))} className='form-control' type="text" placeholder='Yangi guruh nomi...' />
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" data-dismiss="modal">Yopish</button>
+              <button type="button" className="btn btn-primary" onClick={updateGroupHandler}>Yaratish</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
     </div>
     </div>
   );

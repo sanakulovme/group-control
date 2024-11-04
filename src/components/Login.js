@@ -76,7 +76,7 @@ const Login = () => {
             </div>
             <button type="submit" className={submit ? 'btn btn-primary btn-block mt-3 disabled' : 'btn btn-primary btn-block mt-3'}>
             {submit ?
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  
+            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>  
             : ''}
               Kirish
             </button>
