@@ -8,7 +8,7 @@ const Dashboard = () =>{
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [groupData, setGroupData] = useState({creatorId: 6, endDate: "2024-12-31", id: 0, name: '', startDate: "2024-11-04"});
+  const [groupData, setGroupData] = useState({creatorId: 2, endDate: "2024-12-31", id: 0, name: '', startDate: "2024-11-04"});
   const [updateGroup, setUpdateGroup] = useState({id: null, name: ''})
 
   const TOKEN = localStorage.getItem('token');
@@ -30,7 +30,7 @@ const Dashboard = () =>{
   const fetchGroups = async () => {
       try {
         const response = await axios.get(
-          'https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/get/all/admin',
+          'http://52.53.242.81:7088/japan/edu/api/group/get/all/admin',
           config
         );
         setGroups(response.data.object)
@@ -43,8 +43,9 @@ const Dashboard = () =>{
 
   const createGroupHandler = async () => {
     try {
-        const response = await axios.post('https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/create', groupData, config);
+        const response = await axios.post('http://52.53.242.81:7088/japan/edu/api/group/create', groupData, config);
         fetchGroups();
+        setGroupData(values => ({...values, name: ''}))
       } catch (error) {
         console.error('Error fetching groups:', error);
       }
@@ -53,7 +54,7 @@ const Dashboard = () =>{
   const updateGroupHandler = async (event) => {
     event.preventDefault();
     try {
-        const response = await axios.put('https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/update', updateGroup, config);
+        const response = await axios.put('http://52.53.242.81:7088/japan/edu/api/group/update', updateGroup, config);
 
         if(response.data.success === true && response.status == 200){
           fetchGroups()
@@ -67,7 +68,7 @@ const Dashboard = () =>{
   const deleteGroup = async (id) => {
     if(confirm("O'chirilsinmi?")){
       try {
-        const response = await axios.delete(`https://197f-84-54-71-79.ngrok-free.app/japan/edu/api/group/delete?groupId=${id}`, config);
+        const response = await axios.delete(`http://52.53.242.81:7088/japan/edu/api/group/delete?groupId=${id}`, config);
 
         if(response.data.success === true && response.status == 200){
           fetchGroups()
@@ -130,7 +131,7 @@ const Dashboard = () =>{
               </button>
             </div>
             <div className="modal-body">
-              <input onChange={(event) => setGroupData(values => ({ ...values, name: event.target.value}))} className='form-control' type="text" placeholder='Yangi guruh nomi...' />
+              <input required value={groupData.name} onChange={(event) => setGroupData(values => ({ ...values, name: event.target.value}))} className='form-control' type="text" placeholder='Yangi guruh nomi...' />
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-dismiss="modal">Yopish</button>
@@ -157,7 +158,7 @@ const Dashboard = () =>{
               </button>
             </div>
             <div className="modal-body">
-              <input value={updateGroup.name} onChange={(event) => setUpdateGroup(values => ({...values, name: event.target.value}))} className='form-control' type="text" placeholder='Yangi guruh nomi...' />
+              <input required value={updateGroup.name} onChange={(event) => setUpdateGroup(values => ({...values, name: event.target.value}))} className='form-control' type="text" placeholder='Yangi guruh nomi...' />
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-dismiss="modal">Yopish</button>
