@@ -22,7 +22,7 @@ const Login = () => {
     e.preventDefault();
     if(inputs.phoneNumber != '' && inputs.password != ''){
       setSubmit(true)
-      axios.post('https://52.53.242.81:7088/japan/edu/api/auth/login', inputs, config).then(response => {
+      axios.post('http://52.53.242.81:7088/japan/edu/api/auth/login', inputs, config).then(response => {
         if(response.data.status){
           localStorage.setItem('token', response.data.token)
           navigate('/');
