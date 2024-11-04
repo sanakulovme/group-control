@@ -30,7 +30,7 @@ const Dashboard = () =>{
   const fetchGroups = async () => {
       try {
         const response = await axios.get(
-          'http://52.53.242.81:7088/japan/edu/api/group/get/all/admin',
+          'https://52.53.242.81:7088/japan/edu/api/group/get/all/admin',
           config
         );
         setGroups(response.data.object)
@@ -43,7 +43,7 @@ const Dashboard = () =>{
 
   const createGroupHandler = async () => {
     try {
-        const response = await axios.post('http://52.53.242.81:7088/japan/edu/api/group/create', groupData, config);
+        const response = await axios.post('https://52.53.242.81:7088/japan/edu/api/group/create', groupData, config);
         fetchGroups();
         $('#createModal').modal('hide');
         setGroupData(values => ({...values, name: ''}))
@@ -55,7 +55,7 @@ const Dashboard = () =>{
   const updateGroupHandler = async (event) => {
     event.preventDefault();
     try {
-        const response = await axios.put('http://52.53.242.81:7088/japan/edu/api/group/update', updateGroup, config);
+        const response = await axios.put('https://52.53.242.81:7088/japan/edu/api/group/update', updateGroup, config);
 
         if(response.data.success === true && response.status == 200){
           fetchGroups()
@@ -70,7 +70,7 @@ const Dashboard = () =>{
   const deleteGroup = async (id) => {
     if(confirm("O'chirilsinmi?")){
       try {
-        const response = await axios.delete(`http://52.53.242.81:7088/japan/edu/api/group/delete?groupId=${id}`, config);
+        const response = await axios.delete(`https://52.53.242.81:7088/japan/edu/api/group/delete?groupId=${id}`, config);
 
         if(response.data.success === true && response.status == 200){
           fetchGroups()
